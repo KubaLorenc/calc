@@ -12,6 +12,7 @@ namespace ConsoleApp5
 
         public int Call(string[] args)
         {
+            //to w obecnym setupie nie ma jak zamockowac przy testowaniu metody Call, czy to problem?
             var operationType = DetermineOperationType(args[0]);
             return _calculator.Calculate(operationType, 1, 2);
         }
@@ -27,7 +28,7 @@ namespace ConsoleApp5
                 case Operations.Add:
                     return new Adding();
                 default:
-                    return new Adding();
+                    throw new Exception();
             }
         }
     }
