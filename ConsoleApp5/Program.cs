@@ -1,5 +1,7 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
+using ConsoleApp5.Calculator;
+using ConsoleApp5.Calculator.Operations;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ConsoleApp5
 {
@@ -7,42 +9,18 @@ namespace ConsoleApp5
     {
         static void Main(string[] args)
         {
-            //calculator bedzie wstrzykniety przez autofac
-            var service = new CalculatorCommand(new Calculator());
+            var serviceProvider = new ServiceCollection()
+                .AddTransient<ICalculator, Calculator.Calculator>()
+                .AddSingleton<IAddingOperation, Adding>()
+                .AddSingleton<IMultiplyOperation, Multiply>()
+                .BuildServiceProvider();
+
+            var calculator = serviceProvider.GetService<ICalculator>();
+            var addingOperation = serviceProvider.GetService<IAddingOperation>();
+            var multiplyOperation = serviceProvider.GetService<IMultiplyOperation>();
+
+            var service = new CalculatorCommand(calculator, addingOperation, multiplyOperation);
             Console.WriteLine(service.Call(args));
-        } 
-
-
-    }
-    public enum Operations
-    {
-        Undefined,
-        Add,
-        Subtract,
-        Multiply
-    }
-
-    public interface IOperation
-    {
-        public int Operate(int input1, int input2);
-    }
-
-    public interface ICalculator
-    {
-        public int Calculate(IOperation operation, int input1, int input2);
-    }
-    internal class Adding : IOperation
-    {
-        public int Operate(int input1, int input2)
-        {
-            return input1 + input2;
-        }
-    }
-    internal class Calculator : ICalculator
-    {
-        public int Calculate(IOperation operation, int input1, int input2)
-        {
-            return operation.Operate(input1, input2);
         }
     }
 }

@@ -1,35 +1,44 @@
 ﻿using System;
+using ConsoleApp5.Calculator;
+using ConsoleApp5.Calculator.Operations;
 
 namespace ConsoleApp5
 {
-    internal class CalculatorCommand
+    public class CalculatorCommand
     {
         private readonly ICalculator _calculator;
-        public CalculatorCommand(ICalculator calculator)
+        private readonly IAddingOperation _addingOperation;
+        private readonly IMultiplyOperation _multiplyOperation;
+        public CalculatorCommand(ICalculator calculator, IAddingOperation addingOperation, IMultiplyOperation multiplyOperation)
         {
             _calculator = calculator;
+            _addingOperation = addingOperation;
+            _multiplyOperation = multiplyOperation;
         }
 
         public int Call(string[] args)
         {
-            //to w obecnym setupie nie ma jak zamockowac przy testowaniu metody Call, czy to problem?
             var operationType = DetermineOperationType(args[0]);
-            return _calculator.Calculate(operationType, 1, 2);
+            switch (operationType)
+            {
+                case Operations.ADD:
+                    return _calculator.Calculate(_addingOperation, 1);
+                case Operations.MULTIPLY:
+                    return _calculator.Calculate(_multiplyOperation, 1);
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
-        public IOperation DetermineOperationType(string input)
+        public Operations DetermineOperationType(string input)
         {
-            if (!Enum.TryParse(typeof(Operations), input.ToString().ToUpper(), out object operationType))
-            {
-                throw new Exception();
-            }
-            switch ((Operations)operationType)
-            {
-                case Operations.Add:
-                    return new Adding();
-                default:
-                    throw new Exception();
-            }
+            if (!Enum.TryParse(typeof(Operations), input.ToUpper(), out object operationType))
+                return Operations.UNDEFINED;
+
+            if (operationType == null)
+                return Operations.UNDEFINED;
+            
+            return (Operations) operationType;
         }
     }
 }
