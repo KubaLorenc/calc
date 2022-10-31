@@ -19,12 +19,13 @@ namespace ConsoleApp5
         public int Call(string[] args)
         {
             var operationType = DetermineOperationType(args[0]);
+            var inputNumber = DetermineInputValue(args[1]);
             switch (operationType)
             {
                 case Operations.ADD:
-                    return _calculator.Calculate(_addingOperation, 1);
+                    return _calculator.Calculate(_addingOperation, inputNumber);
                 case Operations.MULTIPLY:
-                    return _calculator.Calculate(_multiplyOperation, 1);
+                    return _calculator.Calculate(_multiplyOperation, inputNumber);
                 default:
                     throw new NotImplementedException();
             }
@@ -39,6 +40,14 @@ namespace ConsoleApp5
                 return Operations.UNDEFINED;
             
             return (Operations) operationType;
+        }
+
+        public int DetermineInputValue(string input)
+        {
+            if (!int.TryParse(input, out int result))
+                throw new ArgumentException();
+
+            return result;
         }
     }
 }
